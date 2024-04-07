@@ -2,6 +2,7 @@
 
 This Python project implements a neural network from scratch to classify handwritten digits using the MNIST dataset. It showcases the basics of neural network architecture, forward propagation, backpropagation, and the training process, making it an excellent resource for educational purposes.
 
+The source code was taken from mnielsen/neural-networks-and-deep-learning and slightly modernized. Added comments in Russian to understand the logic of the neural network
 ## Features
 
 - Efficient loading and preprocessing of the MNIST dataset.
