@@ -22,10 +22,10 @@ class Network(object):  # используется для описания не�
         return a
 
     def sgd(self, training_data, epochs, mini_batch_size, eta, test_data):
-        test_data = list(test_data)  # создаем список объектов тестирующей выборки
-        n_test = len(test_data)  # вычисляем длину тестирующей выборки
-        training_data = list(training_data)  # создаем список объектов обучающей выборки
-        n = len(training_data)  # вычисляем размер обучающей выборки
+        test_data = list(test_data)
+        n_test = len(test_data)
+        training_data = list(training_data)
+        n = len(training_data)
 
         for j in range(epochs):  # цикл по эпохам
             random.shuffle(training_data)  # перемешиваем элементы обучающей выборки
@@ -34,7 +34,23 @@ class Network(object):  # используется для описания не�
 
             for mini_batch in mini_batches:  # цикл по подвыборкам
                 self.update_mini_batch(mini_batch, eta)  # один шаг градиентного спуска
-            print("Epoch {0}: {1} / {2}".format(j, self.evaluate(test_data), n_test))  # смотрим прогресс в обучении
+
+            if test_data:
+                epoch_accuracy = self.evaluate(test_data) / n_test * 100
+                print("Epoch {0}: {1} / {2}".format(j + 1, self.evaluate(test_data), n_test))
+
+                # Сохранение результатов в файл
+                with open(f'epoch_{j + 1}.txt', 'w') as f:
+                    f.write(f'Epoch {j + 1}: {self.evaluate(test_data)} / {n_test}\n')
+                    f.write(f'Accuracy: {epoch_accuracy}%\n')
+                    for i in range(n_test):
+                        f.write(
+                            f'Prediction: {np.argmax(self.feedforward(test_data[i][0]))} Answer: {test_data[i][1]}\n')
+
+            else:
+                print("Epoch {0} complete".format(j))
+
+        print('Accuracy:', self.evaluate(test_data) / 1000, '%')
 
     def update_mini_batch(self, mini_batch, eta):
         nabla_b = [np.zeros(b.shape) for b in self.biases]  # список для хранения градиентов
@@ -52,12 +68,6 @@ class Network(object):  # используется для описания не�
 
         self.biases = [b - (eta / len(mini_batch)) * nb
                        for b, nb in zip(self.biases, nabla_b)]  # обновляем веса и смещения
-
-    def cost_derivative(self, output_activations, y):  # Производная функции стоимости
-        # output_activations – выходные активации нейронов выходного слоя
-        # y – вектор правильных ответов
-        # Возвращает вектор частных производных функции стоимости по активациям нейронов выходного слоя
-        return output_activations - y
 
     def backprop(self, x, y):
         nabla_b = [np.zeros(b.shape) for b in
@@ -79,7 +89,7 @@ class Network(object):  # используется для описания не�
             activations.append(activation)  # добавляем элемент (выходные сигналы слоя) в конец списка
 
         # обратное распространение
-        delta = self.cost_derivative(activations[-1], y) * sigmoid_prime(zs[-1])  # считаем меру влияния
+        delta = (activations[-1] - y) * sigmoid_prime(zs[-1])  # считаем меру влияния
         # нейронов выходного слоя L на функцию стоимости (BP1) и производную сигмоидальной функции активации (BP2)
 
         nabla_b[-1] = delta  # градиент dC/db для слоя L (BP3)
@@ -101,8 +111,8 @@ class Network(object):  # используется для описания не�
         return nabla_b, nabla_w
 
     def evaluate(self, test_data):  # Оценка прогресса в обучении
-        test_results = [(np.argmax(self.feedforward(x)), y)
-                        for (x, y) in test_data]  # сравниваем результаты работы нейронной сети с правильными ответами
+        test_results = [(np.argmax(self.feedforward(x)), y) for (x, y) in test_data]
+        # сравниваем результаты работы нейронной сети с правильными ответами
 
         return sum(int(x == y) for (x, y) in test_results)
 
@@ -117,18 +127,3 @@ def sigmoid_prime(z):  # Производная сигмоидальной фу�
     # z – взвешенная сумма входов нейрона
     # Возвращает значение производной сигмоидной функции активации
     return sigmoid(z) * (1 - sigmoid(z))
-
-
-net = Network([2, 3, 1])  # создаем нейронную сеть из трех слоев
-
-print('Сеть net:')
-print('Количетво слоев:', net.num_layers)
-
-for i in range(net.num_layers):
-    print('Количество нейронов в слое', i, ':', net.sizes[i])
-
-for i in range(net.num_layers - 1):
-    print('W_', i + 1, ':')
-    print(np.round(net.weights[i], 2))
-    print('b_', i + 1, ':')
-    print(np.round(net.biases[i], 2))
