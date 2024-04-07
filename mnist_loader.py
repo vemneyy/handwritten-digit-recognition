@@ -26,10 +26,10 @@ def load_data_wrapper():
                    te_d[0]]  # преобразование массивов размера 1 на 784 к массивам размера 784 на 1
     test_data = zip(test_inputs, te_d[1])  # формируем набор тестовых данных из пар (x, y)
 
-    return training_data, validation_data, test_data
+    return training_data, validation_data, test_data # возвращаем наборы данных обучения, проверки и тестирования
 
 
 def vectorized_result(j):
-    e = np.zeros((10, 1))
-    e[j] = 1.0
-    return e
+    e = np.zeros((10, 1))  # создаем массив нулей размера 10 на 1
+    e[j] = 1.0  # присваиваем элементу с индексом j значение 1
+    return e  # возвращаем массив
