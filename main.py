@@ -6,7 +6,7 @@ import numpy as np
 training_data, validation_data, test_data = mnist_loader.load_data_wrapper()
 
 # Создаем нейронную сеть
-net = network.Network([784, 60, 30, 10])
+net = network.Network([784, 30, 10])
 
 for i in range(net.num_layers):
     print('Количество нейронов в слое', i, ':', net.sizes[i])
@@ -19,7 +19,13 @@ for i in range(net.num_layers - 1):
 
 
 # Обучаем нейронную сеть
-net.sgd(training_data, 30, 20, 3.0, test_data=test_data)
+net.sgd(training_data, 30, 10, 3.0, test_data=test_data)
+
+# Сохраняем нейронную сеть
+net.save('mnist_net.json')
+
+# Загружаем нейронную сеть
+net.load('mnist_net.json')
 
 
 
