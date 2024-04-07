@@ -1,6 +1,14 @@
+import os
 import random
 
 import numpy as np
+
+# Убедитесь, что папка logs существует, если нет - создайте ее
+os.makedirs("logs", exist_ok=True)
+
+
+def cost_derivative(output_activations, y):
+    return output_activations - y
 
 
 class Network(object):  # используется для описания нейронной сети
@@ -40,7 +48,7 @@ class Network(object):  # используется для описания не�
                 print("Epoch {0}: {1} / {2}".format(j + 1, self.evaluate(test_data), n_test))
 
                 # Сохранение результатов в файл
-                with open(f'epoch_{j + 1}.txt', 'w') as f:
+                with open(f'logs/epoch_{j + 1}.txt', 'w') as f:
                     f.write(f'Epoch {j + 1}: {self.evaluate(test_data)} / {n_test}\n')
                     f.write(f'Accuracy: {epoch_accuracy}%\n')
                     for i in range(n_test):
@@ -50,7 +58,7 @@ class Network(object):  # используется для описания не�
             else:
                 print("Epoch {0} complete".format(j))
 
-        print('Accuracy:', self.evaluate(test_data) / 1000, '%')
+        print('Accuracy:', self.evaluate(test_data) / 100, '%')
 
     def update_mini_batch(self, mini_batch, eta):
         nabla_b = [np.zeros(b.shape) for b in self.biases]  # список для хранения градиентов
@@ -115,6 +123,22 @@ class Network(object):  # используется для описания не�
         # сравниваем результаты работы нейронной сети с правильными ответами
 
         return sum(int(x == y) for (x, y) in test_results)
+
+    def save(self, param):
+        import json
+        with open(param, 'w') as f:
+            json.dump({'sizes': self.sizes,
+                       'weights': [w.tolist() for w in self.weights],
+                       'biases': [b.tolist() for b in self.biases]}, f)
+
+    def load(self, param):
+        import json
+        with open(param, 'r') as f:
+            data = json.load(f)
+        self.sizes = data['sizes']
+        self.weights = [np.array(w) for w in data['weights']]
+        self.biases = [np.array(b) for b in data['biases']]
+        self.num_layers = len(self.sizes)
 
 
 def sigmoid(z):  # определение сигмоидальной функции активации
