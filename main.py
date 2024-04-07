@@ -9,12 +9,12 @@ training_data, validation_data, test_data = mnist_loader.load_data_wrapper()
 net = network.Network([784, 30, 10])
 
 for i in range(net.num_layers):
-    print('Количество нейронов в слое', i, ':', net.sizes[i])
+    print('Количество нейронов в слое', i + 1, ':', net.sizes[i])
 
 for i in range(net.num_layers - 1):
-    print('Weight_', i + 1, ':')
+    print('\nWeight', i + 1, ':')
     print(np.round(net.weights[i], 2))
-    print('Bias_', i + 1, ':')
+    print('\nBias', i + 1, ':')
     print(np.round(net.biases[i], 2))
 
 

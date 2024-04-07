@@ -58,7 +58,7 @@ class Network(object):  # используется для описания не�
             else:
                 print("Epoch {0} complete".format(j))
 
-        print('Accuracy:', self.evaluate(test_data) / 100, '%')
+        print('\nAccuracy:', self.evaluate(test_data) / 100, '%')
 
     def update_mini_batch(self, mini_batch, eta):
         nabla_b = [np.zeros(b.shape) for b in self.biases]  # список для хранения градиентов
